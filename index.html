@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arduino Control Panel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      text-align: center;
+      padding: 20px;
+    }
+    #status {
+      font-weight: bold;
+      color: green;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    #data {
+      background: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 20px;
+      width: 300px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tableau de contrôle Arduino</h1>
+  <p id="status">Connexion...</p>
+
+  <button onclick="sendCommand('FIRM_UPG')">Firmware Upgrade</button>
+  <button onclick="sendCommand('ON')">Éteindre</button>
+
+  <div id="data">
+    <h3>Données capteur :</h3>
+    <p id="sensorValue">Aucune donnée</p>
+  </div>
+
+  <script>
+   // const ws = new WebSocket(`wss:https://server-chj7.onrender.com:10000`);
+	const ws = new WebSocket("wss://server-chj7.onrender.com");
+
+    ws.onopen = () => {
+      document.getElementById("status").innerText = "Connecté ✅";
+      ws.send(JSON.stringify({ type: 'browser' }));
+	//  document.getElementById("sensorValue").innerText = "V=" + data.V + " - " + data.lastUpdate ;
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+	  console.log("nouveau ring recu 1");
+
+      if (data.type === 'arduino_data') {
+		  console.log("nouveau ring recu 2");
+        document.getElementById("sensorValue").innerText = "V=" + data.V + " - " + data.lastUpdate ;
+      }
+    };
+
+    function sendCommand(cmd) {
+      ws.send(JSON.stringify({ type: 'command', payload: cmd }));
+    }
+  </script>
+</body>
+</html>
