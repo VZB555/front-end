@@ -33,6 +33,7 @@
 <body>
   <h1>Tableau de contrôle Arduino</h1>
   <p id="status">Connexion...</p>
+  
 
   <button onclick="sendCommand('FIRM_UPG')">Firmware Upgrade</button>
   <button onclick="sendCommand('ON')">Éteindre</button>
@@ -40,15 +41,18 @@
   <div id="data">
     <h3>Données capteur :</h3>
     <p id="sensorValue">Aucune donnée</p>
+	<p id="version">Aucune donnée</p>
   </div>
 
   <script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const mac = urlParams.get('mac'); // <-- "84:F3:EB:12:34:56"
    // const ws = new WebSocket(`wss:https://server-chj7.onrender.com:10000`);
 	const ws = new WebSocket("wss://server-chj7.onrender.com");
 
     ws.onopen = () => {
       document.getElementById("status").innerText = "Connecté ✅";
-      ws.send(JSON.stringify({ type: 'browser' }));
+      ws.send(JSON.stringify({ type: 'browser' ,  mac: mac  }));
 	//  document.getElementById("sensorValue").innerText = "V=" + data.V + " - " + data.lastUpdate ;
     };
 
@@ -56,14 +60,19 @@
       const data = JSON.parse(event.data);
 	  console.log("nouveau ring recu 1");
 
+      if (data.type === 'server') {
+	      document.getElementById("status").innerText = data.payload + " ✅" ;
+      }
+
       if (data.type === 'arduino_data') {
 		  console.log("nouveau ring recu 2");
-        document.getElementById("sensorValue").innerText = "V=" + data.V + " - " + data.lastUpdate ;
+          document.getElementById("sensorValue").innerText = data.lastUpdate + '  -  ' + data.Temp ;
+		  document.getElementById("version").innerText =data.V;
       }
     };
 
     function sendCommand(cmd) {
-      ws.send(JSON.stringify({ type: 'command', payload: cmd }));
+      ws.send(JSON.stringify({ type: 'command', payload: cmd ,  mac: mac }));
     }
   </script>
 </body>
