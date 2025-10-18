@@ -41,7 +41,8 @@
 	
 
   <button onclick="sendCommand('FIRM_UPG')">Firmware Upgrade</button>
-  <button onclick="sendCommand('ON')">Éteindre</button>
+  <button onclick="sendCommand('ON')">ON</button>
+  <button onclick="sendCommand('RESET')">RESET</button>
 
   <div id="data">
     <h3>Données capteur :</h3>
@@ -64,15 +65,20 @@
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
 	  console.log("nouveau ring recu 1");
+      console.log(data.type);		
 
       if (data.type === 'server') {
-		  console.log(data.payload) ;
+	      console.log("server");
+		  console.log(data.Temp) ;
 	      document.getElementById("status").innerText =  mac + ": Connecté ✅"; 
-		  document.getElementById("temp").innerText = data.payload ;
+		  document.getElementById("temp").innerText =  data.Temp ;
+		  document.getElementById("sensorValue").innerText = data.lastUpdate ;
+	      document.getElementById("version").innerText =data.V;		
       }
 
       if (data.type === 'arduino_data') {
-		  console.log("nouveau ring recu 2");
+		  console.log("arduino_data");
+		  console.log(data.Temp) ;
           document.getElementById("sensorValue").innerText = data.lastUpdate ;
 		  document.getElementById("temp").innerText = data.Temp ;
 		  document.getElementById("version").innerText =data.V;
