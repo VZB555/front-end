@@ -58,7 +58,7 @@
 
     ws.onopen = () => {
       document.getElementById("status").innerText = "Connecté ✅";
-      ws.send(JSON.stringify({ type: 'browser' ,  mac: mac  }));
+      ws.send(JSON.stringify({ type: 'browser' ,  payload: '' ,  mac: mac   }));
 	//  document.getElementById("sensorValue").innerText = "V=" + data.V + " - " + data.lastUpdate ;
     };
 
